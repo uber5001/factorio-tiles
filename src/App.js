@@ -2,9 +2,17 @@ import React, { Component } from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-function range(n) {
-  return new Array(n).fill(null).map((x,i)=>i);
+function memoize(func) {
+  const map = new Map();
+  return function(x) {
+    if (!map.has(x)) map.set(x, func(x));
+    return map.get(x);
+  }
 }
+
+const range = memoize(function(n) {
+    return new Array(n).fill(null).map((x,i)=>i);
+})
 
 class App extends Component {
   
@@ -43,7 +51,7 @@ class FactorioTiles extends Component {
     this.handleWheel = this.handleWheel.bind(this);
     this.handleDragStart = this.handleDragStart.bind(this);
     this.handleDragStop = this.handleDragStop.bind(this);
-    this.handleMouseMoveOverTile = this.handleMouseMoveOverTile.bind(this);
+    this.drawTile = this.drawTile.bind(this);
   }
 
   handleWheel(event) {
@@ -67,7 +75,7 @@ class FactorioTiles extends Component {
     this.setState({currentDrawingTile: null})
   }
 
-  handleMouseMoveOverTile(event, x, y, mouseDownEvent) {
+  drawTile(event, x, y, mouseDownEvent) {
     if (!this.state.currentDrawingTile && !mouseDownEvent) return;
     const index = x + y * this.props.width
     const tiles = this.state.tiles.slice(0)
@@ -153,10 +161,11 @@ class FactorioTiles extends Component {
               <tr>
               {
                 range(this.props.width).map(x => (
-                  <td
-                    onMouseEnter={(event) => this.handleMouseMoveOverTile(event, x, y)}
-                    onMouseDown={(event) => this.handleMouseMoveOverTile(event, x, y, true)}
-                  ></td>
+                  <FactorioGridTile
+                    x={x}
+                    y={y}
+                    drawTile={this.drawTile}
+                  ></FactorioGridTile>
                 ))
               }
               </tr>
@@ -166,6 +175,29 @@ class FactorioTiles extends Component {
         </table>
       </div>
     )
+  }
+}
+
+class FactorioGridTile extends Component {
+  constructor(props) {
+    super(props);
+    this.handleMouseEnter = this.handleMouseEnter.bind(this);
+    this.handleMouseDown = this.handleMouseDown.bind(this);
+  }
+  handleMouseEnter(event) {
+    this.props.drawTile(event, this.props.x, this.props.y, false)
+  }
+  handleMouseDown(event) {
+    this.props.drawTile(event, this.props.x, this.props.y, true)
+  }
+  shouldComponentUpdate(nextProps) {
+    return this.props.x != nextProps.x || this.props.y != nextProps.y
+  }
+  render() {
+    return <td
+      onMouseEnter={this.handleMouseEnter}
+      onMouseDown={this.handleMouseDown}
+    ></td>
   }
 }
 

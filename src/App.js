@@ -25,7 +25,7 @@ class App extends Component {
           <h1>Factorio-Tiles</h1>
           <p>This is a potential solution to the problems presented in <a href="https://www.factorio.com/blog/post/fff-199">FFF-199</a>.</p>
           <p>Here is a gif of the demo for those of you on mobile:</p>
-          <img src="/images/demo.gif"></img>
+          <img src="images/demo.gif"></img>
           <h2>Instructions</h2>
           <p>Left click to place grass. <br/> Right click to place water. <br/> Scroll to zoom. </p>
           <h3>Premise</h3>
